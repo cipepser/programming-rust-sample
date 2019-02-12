@@ -11,6 +11,8 @@ fn main() {
         pixels: vec![0; width * height],
         size: (width, height),
     };
+    assert_eq!(image.size, (1024, 576));
+    assert_eq!(image.pixels.len(), 1024 * 576);
 }
 
 fn new_map(size: (usize, usize), pixels: Vec<u8>) -> GrayscaleMap {
