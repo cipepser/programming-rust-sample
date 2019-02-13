@@ -41,21 +41,21 @@ fn chop(b: Broom) -> (Broom, Broom) {
 }
 
 /// A first-in, first-out queue of characters.
-pub struct Queue {
-    older: Vec<char>,
+pub struct Queue<T> {
+    older: Vec<T>,
     // older elements, eldest last.
-    younger: Vec<char>, // younger element, youngest last.
+    younger: Vec<T>, // younger element, youngest last.
 }
 
-impl Queue {
+impl<T> Queue<T> {
     /// Push a character onto the back of a queue.
-    pub fn push(&mut self, c: char) {
-        self.younger.push(c);
+    pub fn push(&mut self, t: T) {
+        self.younger.push(t);
     }
 
     /// Pop a character off the front of a queue. Return `Some(c)` if there
     /// was a character to pop, or `None` if the queue was empty.
-    pub fn pop(&mut self) -> Option<char> {
+    pub fn pop(&mut self) -> Option<T> {
         if self.older.is_empty() {
             if self.younger.is_empty() {
                 return None;
@@ -76,11 +76,11 @@ impl Queue {
         self.older.is_empty() && self.younger.is_empty()
     }
 
-    pub fn split(self) -> (Vec<char>, Vec<char>) {
+    pub fn split(self) -> (Vec<T>, Vec<T>) {
         (self.older, self.younger)
     }
 
-    pub fn new() -> Queue {
+    pub fn new() -> Queue<T> {
         Queue {
             older: Vec::new(),
             younger: Vec::new(),
