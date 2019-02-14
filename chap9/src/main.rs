@@ -104,12 +104,12 @@ fn find_extrema<'s>(slice: &'s [i32]) -> Extrema<'s> {
     Extrema { greatest, least }
 }
 
-use std::cell::Cell;
+use std::cell::{Cell, RefCell};
 
 pub struct SpiderRobot {
     species: String,
     web_enabled: bool,
-//    leg_devices: [fd::FileDesc; 8],
+    //    leg_devices: [fd::FileDesc; 8],
     hardware_error_count: Cell<u32>,
 }
 
@@ -194,9 +194,21 @@ fn main() {
 //    assert_eq!(older, vec!['D']);
 //    assert_eq!(younger, vec!['X']);
 
-    // Extrema
-    let a = [0, -3, 0, 15, 48];
-    let e = find_extrema(&a);
-    assert_eq!(*e.least, -3);
-    assert_eq!(*e.greatest, 48);
+//    // Extrema
+//    let a = [0, -3, 0, 15, 48];
+//    let e = find_extrema(&a);
+//    assert_eq!(*e.least, -3);
+//    assert_eq!(*e.greatest, 48);
+
+    // RefCell
+    let ref_cell: RefCell<String> = RefCell::new("hello".to_string());
+
+    let r = ref_cell.borrow(); // ok, returns a Ref<String>
+    let count = r.len(); // ok, returns "hello".len()
+    assert_eq!(count, 5);
+
+    // panic: already borrowed
+    // To avoid this panic, we should add scope for above 3 lines to drop `r` when exits the scope.
+    let mut w = ref_cell.borrow_mut();
+    w.push_str(" world");
 }
