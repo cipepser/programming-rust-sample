@@ -109,7 +109,7 @@ use std::cell::Cell;
 pub struct SpiderRobot {
     species: String,
     web_enabled: bool,
-    leg_devices: [fd::FileDesc; 8],
+//    leg_devices: [fd::FileDesc; 8],
     hardware_error_count: Cell<u32>,
 }
 
@@ -132,8 +132,8 @@ pub struct SpiderSenses {
     // pointer to settings and I/O
     robot: Rc<SpiderRobot>,
 
-    eyes: [Camera; 32],
-    motion: Accelermeter,
+//    eyes: [Camera; 32],
+//    motion: Accelermeter,
 }
 
 fn main() {
