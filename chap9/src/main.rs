@@ -88,6 +88,22 @@ impl<T> Queue<T> {
     }
 }
 
+struct Extrema<'elt> {
+    greatest: &'elt i32,
+    least: &'elt i32,
+}
+
+fn find_extrema<'s>(slice: &'s [i32]) -> Extrema<'s> {
+    let mut greatest = &slice[0];
+    let mut least = &slice[0];
+
+    for i in 1..slice.len() {
+        if slice[i] < *least { least = &slice[i]; }
+        if slice[i] > *greatest { greatest = &slice[i]; }
+    }
+    Extrema { greatest, least }
+}
+
 fn main() {
 //    // GrayscaleMap
 //    let width = 1024;
@@ -115,34 +131,40 @@ fn main() {
 //    assert_eq!(hokey2.name, "Hokey II");
 //    assert_eq!(hokey2.health, 100);
 
-    // Queue
-//    let mut q = Queue {
-//        older: Vec::new(),
-//        younger: Vec::new(),
-//    };
-    let mut q = Queue::new();
+//    // Queue
+////    let mut q = Queue {
+////        older: Vec::new(),
+////        younger: Vec::new(),
+////    };
+//    let mut q = Queue::new();
+//
+//    q.push('0');
+//    q.push('1');
+//    assert_eq!(q.pop(), Some('0'));
+//
+//    q.push('∞');
+//    assert_eq!(q.pop(), Some('1'));
+//    assert_eq!(q.pop(), Some('∞'));
+//    assert_eq!(q.pop(), None);
+//
+//    assert!(q.is_empty());
+//    q.push('x');
+//    assert!(!q.is_empty());
+//    q.pop();
+//
+//    q.push('P');
+//    q.push('D');
+//    assert_eq!(q.pop(), Some('P'));
+//    q.push('X');
+//
+//    let (older, younger) = q.split();
+//    // q is now uninitialized.
+//    assert_eq!(older, vec!['D']);
+//    assert_eq!(younger, vec!['X']);
 
-    q.push('0');
-    q.push('1');
-    assert_eq!(q.pop(), Some('0'));
-
-    q.push('∞');
-    assert_eq!(q.pop(), Some('1'));
-    assert_eq!(q.pop(), Some('∞'));
-    assert_eq!(q.pop(), None);
-
-    assert!(q.is_empty());
-    q.push('x');
-    assert!(!q.is_empty());
-    q.pop();
-
-    q.push('P');
-    q.push('D');
-    assert_eq!(q.pop(), Some('P'));
-    q.push('X');
-
-    let (older, younger) = q.split();
-    // q is now uninitialized.
-    assert_eq!(older, vec!['D']);
-    assert_eq!(younger, vec!['X']);
+    // Extrema
+    let a = [0, -3, 0, 15, 48];
+    let e = find_extrema(&a);
+    assert_eq!(*e.least, -3);
+    assert_eq!(*e.greatest, 48);
 }
