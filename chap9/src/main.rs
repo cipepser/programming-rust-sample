@@ -104,6 +104,38 @@ fn find_extrema<'s>(slice: &'s [i32]) -> Extrema<'s> {
     Extrema { greatest, least }
 }
 
+use std::cell::Cell;
+
+pub struct SpiderRobot {
+    species: String,
+    web_enabled: bool,
+    leg_devices: [fd::FileDesc; 8],
+    hardware_error_count: Cell<u32>,
+}
+
+impl SpiderRobot {
+    /// Increase the error count by 1.
+    pub fn add_hardware_error(&self) {
+        let n = self.hardware_error_count.get();
+        self.hardware_error_count.set(n + 1);
+    }
+
+    /// True if any hardware errors have been reported.
+    pub fn has_hardware_errors(&self) -> bool {
+        self.hardware_error_count.get() > 0
+    }
+}
+
+use std::rc::Rc;
+
+pub struct SpiderSenses {
+    // pointer to settings and I/O
+    robot: Rc<SpiderRobot>,
+
+    eyes: [Camera; 32],
+    motion: Accelermeter,
+}
+
 fn main() {
 //    // GrayscaleMap
 //    let width = 1024;
