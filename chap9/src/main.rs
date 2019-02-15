@@ -105,12 +105,14 @@ fn find_extrema<'s>(slice: &'s [i32]) -> Extrema<'s> {
 }
 
 use std::cell::{Cell, RefCell};
+use std::io::Write;
 
 pub struct SpiderRobot {
     species: String,
     web_enabled: bool,
     //    leg_devices: [fd::FileDesc; 8],
     hardware_error_count: Cell<u32>,
+    log_file: RefCell<std::fs::File>,
 }
 
 impl SpiderRobot {
@@ -123,6 +125,12 @@ impl SpiderRobot {
     /// True if any hardware errors have been reported.
     pub fn has_hardware_errors(&self) -> bool {
         self.hardware_error_count.get() > 0
+    }
+
+    /// Write a line to the logfile
+    pub fn log(&self, message: &str) {
+        let mut file = self.log_file.borrow_mut();
+        writeln!(file, "{}", message).unwrap();
     }
 }
 
@@ -209,6 +217,6 @@ fn main() {
 
     // panic: already borrowed
     // To avoid this panic, we should add scope for above 3 lines to drop `r` when exits the scope.
-    let mut w = ref_cell.borrow_mut();
-    w.push_str(" world");
+//    let mut w = ref_cell.borrow_mut();
+//    w.push_str(" world");
 }
