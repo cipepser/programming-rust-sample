@@ -14,4 +14,6 @@ enum HttpStatus {
 fn main() {
     assert_eq!(size_of::<Pet>(), 1);
     assert_eq!(size_of::<HttpStatus>(), 2); // 404 doesn't fit in a u8
+
+    assert_eq!(HttpStatus::Ok as i32, 200);
 }
