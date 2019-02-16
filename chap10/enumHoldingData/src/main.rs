@@ -38,11 +38,11 @@ impl TimeUnit {
 
 fn rough_time_to_english(rt: RoughTime) -> String {
     match rt {
-        RoughTime::InThePast(units, 1) => format!("{} {} ago", count, units.plural()),
-        RoughTime::InThePast(units, count) => format!("a {} ago", count, units.singular()),
+        RoughTime::InThePast(units, 1) => format!("a {} ago", units.plural()),
+        RoughTime::InThePast(units, count) => format!("{} {} ago", count, units.singular()),
         RoughTime::JustNow => format!("just now"),
-        RoughTime::InTHeFuture(units, 1) => format!("{} {} from now", count, units.plural()),
-        RoughTime::InTHeFuture(units, count) => format!("a {} from now", count, units.singular()),
+        RoughTime::InTHeFuture(units, 1) => format!("a {} from now", units.plural()),
+        RoughTime::InTHeFuture(units, count) => format!("{} {} from now", count, units.singular()),
     }
 }
 
