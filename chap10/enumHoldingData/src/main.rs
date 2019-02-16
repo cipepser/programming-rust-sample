@@ -36,10 +36,20 @@ impl TimeUnit {
     }
 }
 
+fn rough_time_to_english(rt: RoughTime) -> String {
+    match rt {
+        RoughTime::InThePast(units, 1) => format!("{} {} ago", count, units.plural()),
+        RoughTime::InThePast(units, count) => format!("a {} ago", count, units.singular()),
+        RoughTime::JustNow => format!("just now"),
+        RoughTime::InTHeFuture(units, 1) => format!("{} {} from now", count, units.plural()),
+        RoughTime::InTHeFuture(units, count) => format!("a {} from now", count, units.singular()),
+    }
+}
+
 fn main() {
     let four_score_and_seven_years_ago = RoughTime::InThePast(TimeUnit::Years, 4 * 20 + 7);
-    println!("{:?}", four_score_and_seven_years_ago);
+    println!("{:?}", rough_time_to_english(four_score_and_seven_years_ago));
 
     let three_hours_from_now = RoughTime::InThePast(TimeUnit::Hours, 3);
-    println!("{:?}", three_hours_from_now);
+    println!("{:?}", rough_time_to_english(three_hours_from_now));
 }
