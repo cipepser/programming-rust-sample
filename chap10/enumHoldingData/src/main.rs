@@ -47,9 +47,8 @@ fn rough_time_to_english(rt: RoughTime) -> String {
 }
 
 fn main() {
-    let four_score_and_seven_years_ago = RoughTime::InThePast(TimeUnit::Years, 4 * 20 + 7);
-    println!("{:?}", rough_time_to_english(four_score_and_seven_years_ago));
-    
-    let three_hours_from_now = RoughTime::InThePast(TimeUnit::Hours, 3);
-    println!("{:?}", rough_time_to_english(three_hours_from_now));
+    assert_eq!(rough_time_to_english(RoughTime::InThePast(TimeUnit::Years, 4 * 20 + 7)), "87 years ago".to_string());
+    assert_eq!(rough_time_to_english(RoughTime::InThePast(TimeUnit::Hours, 3)), "3 hours ago".to_string());
+    assert_eq!(rough_time_to_english(RoughTime::InThePast(TimeUnit::Months, 1)), "a month ago".to_string());
+    assert_eq!(rough_time_to_english(RoughTime::InTHeFuture(TimeUnit::Hours, 1)), "a hour from now".to_string());
 }
