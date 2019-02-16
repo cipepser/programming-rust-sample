@@ -4,7 +4,7 @@
 enum RoughTime {
     InThePast(TimeUnit, u32),
     JustNow,
-    InTHeFuture(TimeUnit, u32),
+    InTheFuture(TimeUnit, u32),
 }
 
 #[derive(Copy, Clone, Debug, PartialEq)]
@@ -38,11 +38,13 @@ impl TimeUnit {
 
 fn rough_time_to_english(rt: RoughTime) -> String {
     match rt {
+        RoughTime::InThePast(TimeUnit::Hours, 1) => format!("an hour ago"),
         RoughTime::InThePast(units, 1) => format!("a {} ago", units.singular()),
         RoughTime::InThePast(units, count) => format!("{} {} ago", count, units.plural()),
         RoughTime::JustNow => format!("just now"),
-        RoughTime::InTHeFuture(units, 1) => format!("a {} from now", units.singular()),
-        RoughTime::InTHeFuture(units, count) => format!("{} {} from now", count, units.plural()),
+        RoughTime::InTheFuture(TimeUnit::Hours, 1) => format!("an hour from now"),
+        RoughTime::InTheFuture(units, 1) => format!("a {} from now", units.singular()),
+        RoughTime::InTheFuture(units, count) => format!("{} {} from now", count, units.plural()),
     }
 }
 
@@ -50,5 +52,8 @@ fn main() {
     assert_eq!(rough_time_to_english(RoughTime::InThePast(TimeUnit::Years, 4 * 20 + 7)), "87 years ago".to_string());
     assert_eq!(rough_time_to_english(RoughTime::InThePast(TimeUnit::Hours, 3)), "3 hours ago".to_string());
     assert_eq!(rough_time_to_english(RoughTime::InThePast(TimeUnit::Months, 1)), "a month ago".to_string());
-    assert_eq!(rough_time_to_english(RoughTime::InTHeFuture(TimeUnit::Hours, 1)), "a hour from now".to_string());
+    assert_eq!(rough_time_to_english(RoughTime::InThePast(TimeUnit::Hours, 1)), "an hour ago".to_string());
+
+    assert_eq!(rough_time_to_english(RoughTime::InTheFuture(TimeUnit::Months, 1)), "a month from now".to_string());
+    assert_eq!(rough_time_to_english(RoughTime::InTheFuture(TimeUnit::Hours, 1)), "an hour from now".to_string());
 }
