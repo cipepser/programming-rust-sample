@@ -11,6 +11,24 @@ struct TreeNode<T> {
     right: BinaryTree<T>,
 }
 
+impl<T: Ord> BinaryTree<T> {
+    fn add(&mut self, value: T) {
+        match *self {
+            BinaryTree::Empty =>
+                *self = BinaryTree::NonEmpty(Box::new(TreeNode {
+                    element: value,
+                    left: BinaryTree::Empty,
+                    right: BinaryTree::Empty,
+                })),
+            BinaryTree::NonEmpty(ref mut node) =>
+                if value <= node.element {
+                    node.left.add(value);
+                } else {
+                    node.right.add(value);
+                }
+        }
+    }
+}
 
 fn main() {
     use self::BinaryTree::*;
@@ -45,14 +63,17 @@ fn main() {
     }));
 
     let saturn_tree = NonEmpty(Box::new(TreeNode {
-        element: "Satrun",
+        element: "Saturn",
         left: mars_tree,
         right: uranus_tree,
     }));
 
-//    // after learned the way in later chapter, we can write like below:
-//    let mut tree = BinaryTree::Empty;
-//    for planet in planets {
-//        tree.add(planet);
-//    }
+    // after learned the way in later chapter, we can write like below:
+    let mut tree = BinaryTree::Empty;
+    tree.add("Jupiter");
+    tree.add("Mercury");
+    tree.add("Venus");
+    tree.add("Mars");
+    tree.add("Uranus");
+    tree.add("Saturn");
 }
