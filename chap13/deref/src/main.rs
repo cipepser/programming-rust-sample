@@ -36,4 +36,11 @@ fn main() {
     // Change the 'z' to 'w', by assigning to the `Selector`'s  referent.
     *s = 'w';
     assert_eq!(s.elements, ['x', 'y', 'w']);
+
+    let t = Selector {
+        elements: vec!["good", "bad", "ugly"],
+        current: 2,
+    };
+    fn show_it(thing: &str) { println!("{}", thing); }
+    show_it(&t);
 }
