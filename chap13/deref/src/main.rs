@@ -43,4 +43,10 @@ fn main() {
     };
     fn show_it(thing: &str) { println!("{}", thing); }
     show_it(&t);
+
+    use std::fmt::Display;
+    fn show_it_generic<T: Display>(thing: T) { println!("{}", thing); }
+//    show_it_generic(&t);
+    // error[E0277]: `Selector<&str>` doesn't implement `std::fmt::Display`
+    show_it_generic(&t as &str);
 }
