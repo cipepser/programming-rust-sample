@@ -13,19 +13,23 @@ struct Response {
     body: Vec<u8>,
 }
 
-struct BasicRouter<C> where C: Fn(&Request) -> Response {
-    routes: HashMap<String, C>,
+type BoxedCallback = Box<Fn(&Request) -> Response>;
+
+struct BasicRouter {
+    routes: HashMap<String, BoxedCallback>,
 }
 
-impl<C> BasicRouter<C> where C: Fn(&Request) -> Response {
+impl BasicRouter {
     /// Create an empty router.
-    fn new() -> BasicRouter<C> {
+    fn new() -> BasicRouter {
         BasicRouter { routes: HashMap::new() }
     }
 
     /// Add a rounte to the router.
-    fn add_router(&mut self, url: &str, callback: C) {
-        self.routes.insert(url.to_string(), callback);
+    fn add_router<C>(&mut self, url: &str, callback: C)
+        where C: Fn(&Request) -> Response + 'static
+    {
+        self.routes.insert(url.to_string(), Box::new(callback));
     }
 }
 
@@ -48,7 +52,7 @@ fn get_gcd_response(req: Request) -> Response {
 fn main() {
     let mut router = BasicRouter::new();
     router.add_router("/", |_| get_from_response());
-    router.add_router("/gcd", |&req| get_gcd_response(
+    router.add_router("/gcd", |req| get_gcd_response(
         Request {
             method: "req".to_string(),
             url: "example.com".to_string(),
