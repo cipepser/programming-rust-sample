@@ -1,61 +1,63 @@
-//use std::fmt::Display;
+use std::mem::transmute;
 
-//trait Being<T: Display> {
-//    fn speak(T);
-//}
-//
-//struct Person;
-//
-//impl Being for Person {
-//    fn speak(s: &str) {
-//        println!("{}", s);
-//    }
-//}
-
-//struct Japanese;
-//
-//impl Person for Japanese {
-//    fn speak() {};
-//}
-//
-//struct American;
-//
-//
-////trait Handler<W: Writer> {
-////    fn handle(&self, &mut W) -> IoResult<()>;
-////}
-////
-////
-////fn take_str<T:?Sized>(_s: &T) {
-////}
+trait Foo {
+    fn fn1(&self, x: u32);
+    fn fn2(&self, x: u32) where Self: Sized;
+    fn fn3(&self, x: u32);
+}
 
 #[derive(Debug)]
-struct S<T: ?Sized> {
-    b: Box<T>
+struct S1(u64, u64, u64);
+
+impl Foo for S1 {
+    fn fn1(&self, x: u32) {
+        println!("fn1({:?}, {})", self, x);
+    }
+    fn fn2(&self, x: u32) where Self: Sized {
+        println!("fn2({:?}, {})", self, x);
+    }
+    fn fn3(&self, x: u32) {
+        println!("fn3({:?}, {})", self, x);
+    }
+}
+
+impl std::ops::Drop for S1 {
+    fn drop(&mut self) {
+        println!("drop({:?})", self);
+    }
+}
+
+struct FooVtable {
+    drop_glue: fn(&mut S1),
+    size: usize,
+    align: usize,
+    fn1_ptr: fn(&S1, u32),
+    fn2_ptr: fn(&S1, u32),
+    fn3_ptr: fn(&S1, u32),
+}
+
+fn recover_S1(foo: &mut Foo) -> (&mut S1, &'static FooVtable) {
+    unsafe { transmute(foo) }
 }
 
 fn main() {
-    let s = S { b: Box::new("a".to_string()) };
-    println!("{:?}", s);
-    println!("{:?}", as_raw_bytes(&s));
-
-    let c = "alice".to_string();
-    let size_of_val = std::mem::size_of_val(&c);
-    println!("{:?}", as_raw_bytes(&c));
-    println!("size_of_val: {}", size_of_val);
-    println!("size_of: {}", std::mem::size_of::<bool>());
+    let mut x = S1(3, 4, 5);
+    let foo: &mut Foo = &mut x;
+    let (xx, vtbl) = recover_S1(foo);
+    println!("vtbl.drop_glue = {:x}", vtbl.drop_glue as usize);
+    println!("vtbl.size = {:x}", vtbl.size);
+    println!("vtbl.align = {:x}", vtbl.align);
+    println!("vtbl.fn1_ptr = {:x}", vtbl.fn1_ptr as usize);
+    println!("vtbl.fn2_ptr = {:x}", vtbl.fn2_ptr as usize);
+    println!("vtbl.fn3_ptr = {:x}", vtbl.fn3_ptr as usize);
+    println!("S1::fn1 = {:x}", S1::fn1 as usize);
+    println!("S1::fn2 = {:x}", S1::fn2 as usize);
+    println!("S1::fn3 = {:x}", S1::fn3 as usize);
+    (vtbl.drop_glue)(xx);
+    (vtbl.fn1_ptr)(xx, 100);
+    // executing fn2_ptr, get a result: segmentation fault
+    (vtbl.fn3_ptr)(xx, 300);
 }
 
-//fn main() {
-////    let s = "hello!";
-////    take_str(s);
-//}
-
-
-fn as_raw_bytes<'a, T: ?Sized>(x: &'a T) -> &'a [u8] {
-    unsafe {
-        std::slice::from_raw_parts(
-            x as *const T as *const u8,
-            std::mem::size_of_val(x))
-    }
-}
+// ## References
+// - RustのSizedとfatポインタ - 簡潔なQ https://qnighy.hatenablog.com/entry/2017/03/04/131311
