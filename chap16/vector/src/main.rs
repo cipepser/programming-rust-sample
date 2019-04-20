@@ -6,4 +6,7 @@ fn main() {
 
     v.remove(2);
     assert_eq!(v, vec![0, 10, 20, 30]);
+
+    v.drain(1..3);
+    assert_eq!(v, vec![0, 30]);
 }
