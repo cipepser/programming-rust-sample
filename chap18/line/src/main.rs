@@ -1,9 +1,10 @@
 use std::io;
 use std::io::prelude::*;
 
-fn grep(target: &str) -> io::Result<()> {
-    let stdin = io::stdin();
-    for line_result in stdin.lock().lines() {
+fn grep<R>(target: &str, reader: R) -> io::Result<()>
+    where R: BufRead
+{
+    for line_result in reader.lines() {
         let line = line_result?;
         if line.contains(target) {
             println!("{}", line);
@@ -14,5 +15,6 @@ fn grep(target: &str) -> io::Result<()> {
 
 fn main() {
     let s = "tt";
-    println!("{:?}", grep(&s));
+    let stdin = io::stdin();
+    println!("{:?}", grep(&s, stdin.lock()));
 }
