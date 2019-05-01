@@ -5,3 +5,4 @@ authors = ["cipepser <respepic@gmail.com>"]
 edition = "2018"
 
 [dependencies]
+reqwest = "0.5.1"
