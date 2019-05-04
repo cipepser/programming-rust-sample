@@ -51,5 +51,21 @@ impl InMemoryIndex {
         index
     }
 
-    // TODO: implement merge, is_empty, is_large
+    pub fn merge(&mut self, other: InMemoryIndex) {
+        for (term, hits) in other.map {
+            self.map.entry(term)
+                .or_insert_with(|| vec![])
+                .extend(hits)
+        }
+        self.word_count += other.word_count;
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.word_count == 0
+    }
+
+    pub fn is_large(&self) -> bool {
+        const REASONABLE_SIZE: usize = 100_000_000;
+        self.word_count > REASONABLE_SIZE
+    }
 }
