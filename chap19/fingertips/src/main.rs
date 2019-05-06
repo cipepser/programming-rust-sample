@@ -1,5 +1,8 @@
+extern crate byteorder;
+
 mod index;
 mod tmp;
+mod write;
 
 use std::fs::File;
 use std::io;
@@ -9,6 +12,8 @@ use std::sync::mpsc::{channel, Receiver};
 use std::path::{PathBuf, Path};
 
 use index::InMemoryIndex;
+use tmp::TmpDir;
+use write::write_index_to_tmp_file;
 
 
 fn start_file_reader_thread(documents: Vec<PathBuf>) -> (Receiver<String>, JoinHandle<io::Result<()>>) {
@@ -49,7 +54,7 @@ fn start_file_indexing_thread(texts: Receiver<String>) -> (Receiver<InMemoryInde
 // TODO: implement start_in_memory_merge_thread, start_index_writer_thread and merge_index_files
 
 fn start_in_memory_merge_thread(file_indexes: Receiver<InMemoryIndex>)
-    -> (Receiver<InMemoryIndex>, JoinHandle<()>)
+                                -> (Receiver<InMemoryIndex>, JoinHandle<()>)
 {
     let (sender, receiver) = channel();
 
@@ -73,10 +78,20 @@ fn start_in_memory_merge_thread(file_indexes: Receiver<InMemoryIndex>)
 }
 
 fn start_index_writer_thread(big_indexes: Receiver<InMemoryIndex>, output_dir: &Path)
-    -> (Receiver<PathBuf>, JoinHandle<io::Result()>)
+                             -> (Receiver<PathBuf>, JoinHandle<io::Result<()>>)
 {
     let (sender, receiver) = channel();
 
-    // TODO: ここから続き
-    let mut tmp_dir = TmpDir
+    let mut tmp_dir = TmpDir::new(output_dir);
+    let handle = spawn(move || {
+        for index in big_indexes {
+            let file = write_index_to_tmp_file(index, &mut tmp_dir)?;
+            if sender.send(file).is_err() {
+                break;
+            }
+        }
+        Ok(())
+    });
+
+    (receiver, handle)
 }

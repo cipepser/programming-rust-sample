@@ -1,15 +1,15 @@
 use std::fs::File;
-use std::io::{self, BufWriter, SeekFromm, SeekFrom};
-use std::io::preclude::*;
+use std::io::{self, BufWriter, SeekFrom};
+use std::io::prelude::*;
 use std::path::PathBuf;
 use byteorder::{LittleEndian, WriteBytesExt};
 
-use index::InMemoryIndex;
-use tmp::TmpDir;
+use crate::index::InMemoryIndex;
+use crate::tmp::TmpDir;
 
 pub struct IndexFileWriter {
     offset: u64,
-    writer: BufWiter<File>,
+    writer: BufWriter<File>,
     contents_buf: Vec<u8>,
 }
 

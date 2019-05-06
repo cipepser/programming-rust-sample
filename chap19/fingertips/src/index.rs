@@ -4,7 +4,7 @@ use byteorder::LittleEndian;
 fn tokenize(text: &str) -> Vec<&str> {
     text.split(|ch: char| !ch.is_alphanumeric())
         .filter(|word| !word.is_empty())
-        .collet()
+        .collect()
 }
 
 pub struct InMemoryIndex {
@@ -28,7 +28,7 @@ impl InMemoryIndex {
 
         let text = text.to_lowercase();
         let tokens = tokenize(&text);
-        for (i, token) in tokens.iter().enumurate() {
+        for (i, token) in tokens.iter().enumerate() {
             let hits = index.map
                 .entry(token.to_string())
                 .or_insert_with(|| {
