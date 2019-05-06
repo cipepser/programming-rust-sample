@@ -1,7 +1,6 @@
 use std::io::{self, BufWriter};
 use std::fs::{self, File};
 use std::path::{Path, PathBuf};
-use std::fs::File;
 
 #[derive(Clone)]
 pub struct TmpDir {
