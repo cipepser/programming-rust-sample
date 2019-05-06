@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use byteorder::LittleEndian;
 
-fn tokenize(text: &str) -> vec<&str> {
+fn tokenize(text: &str) -> Vec<&str> {
     text.split(|ch: char| !ch.is_alphanumeric())
         .filter(|word| !word.is_empty())
         .collet()
