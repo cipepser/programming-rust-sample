@@ -52,7 +52,6 @@ fn start_file_indexing_thread(texts: Receiver<String>) -> (Receiver<InMemoryInde
 }
 
 // TODO: implement start_in_memory_merge_thread, start_index_writer_thread and merge_index_files
-
 fn start_in_memory_merge_thread(file_indexes: Receiver<InMemoryIndex>)
                                 -> (Receiver<InMemoryIndex>, JoinHandle<()>)
 {

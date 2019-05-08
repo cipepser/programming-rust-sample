@@ -33,6 +33,7 @@ impl InMemoryIndex {
                 .entry(token.to_string())
                 .or_insert_with(|| {
                     let mut hits = Vec::with_capacity(4 + 4);
+                    // TODO: write_u32がメソッドになるとcargo checkで怒られる。write.rsはOK。
                     hits.write_u32::<LittleEndian>(document_id).unwrap();
                     vec![hits]
                 });
