@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use byteorder::LittleEndian;
+use byteorder::{LittleEndian, WriteBytesExt};
 
 fn tokenize(text: &str) -> Vec<&str> {
     text.split(|ch: char| !ch.is_alphanumeric())
@@ -33,7 +33,6 @@ impl InMemoryIndex {
                 .entry(token.to_string())
                 .or_insert_with(|| {
                     let mut hits = Vec::with_capacity(4 + 4);
-                    // TODO: write_u32がメソッドになるとcargo checkで怒られる。write.rsはOK。
                     hits.write_u32::<LittleEndian>(document_id).unwrap();
                     vec![hits]
                 });
