@@ -3,6 +3,8 @@ extern crate byteorder;
 mod index;
 mod tmp;
 mod write;
+mod read;
+mod merge;
 
 use std::fs::File;
 use std::io;
@@ -14,7 +16,7 @@ use std::path::{PathBuf, Path};
 use index::InMemoryIndex;
 use tmp::TmpDir;
 use write::write_index_to_tmp_file;
-
+use merge::FileMerge;
 
 fn start_file_reader_thread(documents: Vec<PathBuf>) -> (Receiver<String>, JoinHandle<io::Result<()>>) {
     let (sender, receiver) = channel();
@@ -51,7 +53,6 @@ fn start_file_indexing_thread(texts: Receiver<String>) -> (Receiver<InMemoryInde
     (receiver, handle)
 }
 
-// TODO: implement start_in_memory_merge_thread, start_index_writer_thread and merge_index_files
 fn start_in_memory_merge_thread(file_indexes: Receiver<InMemoryIndex>)
                                 -> (Receiver<InMemoryIndex>, JoinHandle<()>)
 {
@@ -93,4 +94,11 @@ fn start_index_writer_thread(big_indexes: Receiver<InMemoryIndex>, output_dir: &
     });
 
     (receiver, handle)
+}
+
+// TODO: implement `merge_index_files`
+fn merge_index_files(files: Receiver<PathBuf>, output_dir: &Path)
+                     -> io::Result<()>
+{
+    let mut merge = FileMerge::
 }
