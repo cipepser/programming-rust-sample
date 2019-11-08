@@ -123,4 +123,11 @@ fn merge_streams(files: Vec<PathBuf>, out: BufWriter<File>) -> io::Result<()> {
     output.finish()
 }
 
-// TODO: implement `merge_reserve`
+fn merge_reserved(filenames: &mut Vec<PathBuf>, tmp_dir: &mut TmpDir) -> io::Result<()> {
+    filenames.reverse();
+    let (merged_filename, out) = tmp_dir.create()?;
+    let mut to_merge = Vec::with_capacity(NSTREAMS);
+    mem::swap(filenames, &mut to_merge);
+    filenames.push(merged_filename);
+    Ok(())
+}
