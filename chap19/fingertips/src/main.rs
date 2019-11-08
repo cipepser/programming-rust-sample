@@ -105,3 +105,41 @@ fn merge_index_files(files: Receiver<PathBuf>, output_dir: &Path)
     }
     merge.finish()
 }
+
+fn run_pipeline(documents: Vec<PathBuf>, output_dir: PathBuf) -> io::Result<()> {
+    let (texts, h1) = start_file_reader_thread(documents);
+    let (pints, h2) = start_file_indexing_thread(texts);
+    let (gallons, h3) = start_in_memory_merge_thread(pints);
+    let (files, h4) = start_index_writer_thread(gallons, &output_dir);
+    let result = merge_index_files(files, &output_dir);
+
+    let r1 = h1.join().unwrap();
+    h2.join().unwrap();
+    h3.join().unwrap();
+    let r4 = h4.join().unwrap();
+
+    r1?;
+    r4?;
+    result
+}
+
+fn expand_filename_arguments(args: Vec<String>) -> io::Result<Vec<PathBuf>> {
+    let mut filenames = vec![];
+    for arg in args {
+        let path = PathBuf::from(arg);
+        if path.metadata()?.is_dir() {
+            for entry in path.read_dir()? {
+                let entry = entry?;
+                if entry.file_type()?.is_file() {
+                    filenames.push(entry.path());
+                }
+            }
+        } else {
+            filenames.push(path);
+        }
+    }
+    Ok(filenames)
+}
+
+// TODO: implement `run`
+// TODO: implement `main`
