@@ -3,7 +3,6 @@ use std::io::{self, BufReader, SeekFrom};
 use std::fs::{self, File};
 use std::path::Path;
 use byteorder::{ReadBytesExt, LittleEndian};
-use std::string::FromUtf8Error;
 use crate::write::IndexFileWriter;
 
 pub(crate) struct IndexFileReader {
