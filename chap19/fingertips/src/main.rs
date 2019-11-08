@@ -18,6 +18,32 @@ use tmp::TmpDir;
 use write::write_index_to_tmp_file;
 use merge::FileMerge;
 
+fn run_single_threaded(documents: Vec<PathBuf>, output_dir: PathBuf) -> io::Result<()> {
+    let mut accumulated_index = InMemoryIndex::new();
+    let mut merge = FileMerge::new(&output_dir);
+    let mut tmp_dir = TmpDir::new(&output_dir);
+
+    for (doc_id, filename) in documents.into_iter().enumerate() {
+        let mut f = File::open(filename)?;
+        let mut text = String::new();
+        f.read_to_string(&mut text)?;
+
+        let index = InMemoryIndex::from_single_document(doc_id, text);
+        accumulated_index.merge(index);
+        if accumulated_index.is_large() {
+            let file = write_index_to_tmp_file(accumulated_index, &mut tmp_dir)?;
+            merge.add_file(file)?;
+            accumulated_index = InMemoryIndex::new();
+        }
+    }
+
+    if !accumulated_index.is_empty() {
+        let file = write_index_to_tmp_file(accumulated_index, &mut tmp_dir)?;
+        merge.add_file(file)?;
+    }
+    merge.finish()
+}
+
 fn start_file_reader_thread(documents: Vec<PathBuf>) -> (Receiver<String>, JoinHandle<io::Result<()>>) {
     let (sender, receiver) = channel();
 
@@ -141,5 +167,15 @@ fn expand_filename_arguments(args: Vec<String>) -> io::Result<Vec<PathBuf>> {
     Ok(filenames)
 }
 
-// TODO: implement `run`
+fn run(filenames: Vec<String>, single_threaded: bool) -> io::Result<()> {
+    let output_dir = PathBuf::from(".");
+    let documents = expand_filename_arguments(filenames)?;
+
+    if single_threaded {
+        run_single_threaded(documents, output_dir)
+    } else {
+        run_pipeline(documents, output_dir)
+    }
+}
+
 // TODO: implement `main`
