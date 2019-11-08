@@ -72,10 +72,10 @@ impl IndexFileReader {
         self.next.as_ref()
     }
 
-    pub fn is_at(&self, term: String) -> bool { // fix: &str -> String
+    pub fn is_at(&self, term: &str) -> bool {
         match self.next {
             Some(ref e) => e.term == term,
-            None => false,
+            None => false
         }
     }
 

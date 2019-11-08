@@ -1,10 +1,9 @@
-use std::io;
 use std::path::{PathBuf, Path};
 use std::mem;
 
 use crate::tmp::TmpDir;
 use crate::read::IndexFileReader;
-use std::io::BufWriter;
+use std::io::{self, BufWriter};
 use std::fs::{self, File};
 use crate::write::IndexFileWriter;
 
@@ -36,7 +35,7 @@ impl FileMerge {
 
             self.stacks[level].push(file);
 
-            if self.stacks[level].len() < NSTEAMS {
+            if self.stacks[level].len() < NSTREAMS {
                 break;
             }
 
@@ -62,7 +61,7 @@ impl FileMerge {
         }
 
         if tmp.len() > 1 {
-            mergee_reserve(&mut tmp, &mut self.tmp_dir)?;
+            merge_reserved(&mut tmp, &mut self.tmp_dir)?;
         }
         assert!(tmp.len() <= 1);
         match tmp.pop() {
@@ -77,7 +76,7 @@ impl FileMerge {
 }
 
 fn merge_streams(files: Vec<PathBuf>, out: BufWriter<File>) -> io::Result<()> {
-    let mut streams: Vec<Indexfile> = files.into_iter()
+    let mut streams: Vec<IndexFileReader> = files.into_iter()
         .map(IndexFileReader::open_and_delete)
         .collect::<io::Result<_>>()?;
 
@@ -115,9 +114,9 @@ fn merge_streams(files: Vec<PathBuf>, out: BufWriter<File>) -> io::Result<()> {
                     count -= 1;
                 }
             }
-            output.write_contents_entry(term, df, point, nbytes as u64);
-            point += nbytes as u64;
         }
+        output.write_contents_entry(term, df, point, nbytes as u64);
+        point += nbytes as u64;
     }
     assert!(streams.iter().all(|s| s.peek().is_none()));
     output.finish()
@@ -128,6 +127,7 @@ fn merge_reserved(filenames: &mut Vec<PathBuf>, tmp_dir: &mut TmpDir) -> io::Res
     let (merged_filename, out) = tmp_dir.create()?;
     let mut to_merge = Vec::with_capacity(NSTREAMS);
     mem::swap(filenames, &mut to_merge);
+    merge_streams(to_merge, out)?;
     filenames.push(merged_filename);
     Ok(())
 }
