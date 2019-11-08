@@ -96,9 +96,12 @@ fn start_index_writer_thread(big_indexes: Receiver<InMemoryIndex>, output_dir: &
     (receiver, handle)
 }
 
-// TODO: implement `merge_index_files`
 fn merge_index_files(files: Receiver<PathBuf>, output_dir: &Path)
                      -> io::Result<()>
 {
-    let mut merge = FileMerge::
+    let mut merge = FileMerge::new(output_dir);
+    for file in files {
+        merge.add_file(file)?;
+    }
+    merge.finish()
 }
