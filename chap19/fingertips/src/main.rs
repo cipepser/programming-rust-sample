@@ -12,11 +12,13 @@ use std::io::prelude::*;
 use std::thread::{spawn, JoinHandle};
 use std::sync::mpsc::{channel, Receiver};
 use std::path::{PathBuf, Path};
+use argparse::{ArgumentParser, Collect, StoreTrue};
 
 use index::InMemoryIndex;
 use tmp::TmpDir;
 use write::write_index_to_tmp_file;
 use merge::FileMerge;
+use std::error::Error;
 
 fn run_single_threaded(documents: Vec<PathBuf>, output_dir: PathBuf) -> io::Result<()> {
     let mut accumulated_index = InMemoryIndex::new();
@@ -178,4 +180,26 @@ fn run(filenames: Vec<String>, single_threaded: bool) -> io::Result<()> {
     }
 }
 
-// TODO: implement `main`
+fn main() {
+    let mut single_threaded = false;
+    let mut filenames = vec![];
+
+    {
+        let mut ap = ArgumentParser::new();
+        ap.set_description("Make an inverted index for searching documents.");
+        ap.refer(&mut single_threaded)
+            .add_option(&["-1", "--single-threaded"], StoreTrue,
+                        "Do all the work on a single thread.");
+        ap.refer(&mut filenames)
+            .add_argument("filenames", Collect,
+                          "Names of files/directories to index.\
+            For directories, all .txt files immediately \
+            under the directory and indexed.");
+        ap.parse_args_or_exit();
+    }
+
+    match run(filenames, single_threaded) {
+        Ok(()) => {}
+        Err(err) => println!("error: {:?}", err.description())
+    }
+}
