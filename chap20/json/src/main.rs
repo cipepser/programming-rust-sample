@@ -84,3 +84,19 @@ fn json_array_with_json_element() {
     ]);
     assert_eq!(macro_generated_value, hand_coded_value);
 }
+
+#[test]
+fn json_array_with_rust_expression() {
+    let width = 4.0;
+    let macro_generated_value = json!(
+        {
+            "width": width,
+            "height": (width * 9.0 / 4.0)
+        }
+    );
+    let hand_coded_value = Json::Object(Box::new(vec![
+        ("width".to_string(), Json::Number(width)),
+        ("height".to_string(), Json::Number(width * 9.0 / 4.0))
+    ].into_iter().collect()));
+    assert_eq!(macro_generated_value, hand_coded_value);
+}
